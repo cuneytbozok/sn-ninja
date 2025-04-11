@@ -4,13 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
-} from "@/components/ui/accordion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, ExternalLink, SearchIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,7 +24,6 @@ export default function SearchPage() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [contentOverflows, setContentOverflows] = useState(false);
   const answerContentRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -45,38 +38,50 @@ export default function SearchPage() {
     setIsLoading(true);
     
     // Mock data - would be replaced with real API call
-    setTimeout(() => {
-      setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.\n\nServiceNow was founded in 2004 by Fred Luddy, who previously served as CTO at Peregrine Systems and Remedy Corporation. The company initially focused on IT service management but has since expanded into other areas like IT operations management, IT business management, customer service management, HR service delivery, and security operations.\n\nServiceNow's platform is built on a single data model and uses a common service data platform. This allows for seamless integration between different modules and applications. The platform includes features such as workflow automation, AI and machine learning capabilities, virtual agents, performance analytics, and a mobile experience.\n\nMany large enterprises use ServiceNow to manage their IT services and business workflows. The platform is highly customizable and can be tailored to meet specific organizational needs. ServiceNow also offers a developer program that allows developers to build custom applications on the Now Platform.");
+    // In the real implementation, we would use searchQuery to fetch data
+    try {
+      // Example of how you would use the search query parameter:
+      // const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+      // const data = await response.json();
+      // setAnswer(data.answer);
+      // setResults(data.results);
       
-      setResults([
-        {
-          title: "What is ServiceNow? | ServiceNow",
-          url: "https://www.servicenow.com/what-is-servicenow.html",
-          snippet: "ServiceNow is a platform that enables digital workflows to drive business growth, increase resilience, and enhance employee productivity..."
-        },
-        {
-          title: "ServiceNow - Wikipedia",
-          url: "https://en.wikipedia.org/wiki/ServiceNow",
-          snippet: "ServiceNow is an American software company based in Santa Clara, California that develops a cloud computing platform to help companies manage digital workflows..."
-        },
-        {
-          title: "ServiceNow - Overview, Products, Competitors",
-          url: "https://docs.servicenow.com/bundle/tokyo-platform-administration/page/administer/overview",
-          snippet: "ServiceNow is a software platform that enables organizations to manage digital workflows for enterprise operations. ServiceNow provides cloud-based solutions..."
-        },
-        {
-          title: "ServiceNow Developer Documentation",
-          url: "https://developer.servicenow.com/dev.do",
-          snippet: "ServiceNow Developer documentation provides resources for building applications on the Now Platform. Find guides, API references, and more..."
-        },
-        {
-          title: "ServiceNow Community Forums",
-          url: "https://community.servicenow.com",
-          snippet: "Connect with ServiceNow experts, ask questions, share ideas, and access resources to make the most of your ServiceNow implementation..."
-        }
-      ]);
+      setTimeout(() => {
+        setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.\n\nServiceNow was founded in 2004 by Fred Luddy, who previously served as CTO at Peregrine Systems and Remedy Corporation. The company initially focused on IT service management but has since expanded into other areas like IT operations management, IT business management, customer service management, HR service delivery, and security operations.\n\nServiceNow's platform is built on a single data model and uses a common service data platform. This allows for seamless integration between different modules and applications. The platform includes features such as workflow automation, AI and machine learning capabilities, virtual agents, performance analytics, and a mobile experience.\n\nMany large enterprises use ServiceNow to manage their IT services and business workflows. The platform is highly customizable and can be tailored to meet specific organizational needs. ServiceNow also offers a developer program that allows developers to build custom applications on the Now Platform.");
+        
+        setResults([
+          {
+            title: "What is ServiceNow? | ServiceNow",
+            url: "https://www.servicenow.com/what-is-servicenow.html",
+            snippet: "ServiceNow is a platform that enables digital workflows to drive business growth, increase resilience, and enhance employee productivity..."
+          },
+          {
+            title: "ServiceNow - Wikipedia",
+            url: "https://en.wikipedia.org/wiki/ServiceNow",
+            snippet: "ServiceNow is an American software company based in Santa Clara, California that develops a cloud computing platform to help companies manage digital workflows..."
+          },
+          {
+            title: "ServiceNow - Overview, Products, Competitors",
+            url: "https://docs.servicenow.com/bundle/tokyo-platform-administration/page/administer/overview",
+            snippet: "ServiceNow is a software platform that enables organizations to manage digital workflows for enterprise operations. ServiceNow provides cloud-based solutions..."
+          },
+          {
+            title: "ServiceNow Developer Documentation",
+            url: "https://developer.servicenow.com/dev.do",
+            snippet: "ServiceNow Developer documentation provides resources for building applications on the Now Platform. Find guides, API references, and more..."
+          },
+          {
+            title: "ServiceNow Community Forums",
+            url: "https://community.servicenow.com",
+            snippet: "Connect with ServiceNow experts, ask questions, share ideas, and access resources to make the most of your ServiceNow implementation..."
+          }
+        ]);
+        setIsLoading(false);
+      }, 1500);
+    } catch (error) {
+      console.error("Error fetching data:", error);
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   useEffect(() => {
@@ -85,12 +90,14 @@ export default function SearchPage() {
     }
   }, [initialQuery]);
 
-  // Check if content overflows after answer is set
+  // Check if content overflows - using this for UI feedback
   useEffect(() => {
     if (answerContentRef.current) {
       const contentHeight = answerContentRef.current.scrollHeight;
       const containerHeight = 120; // Same as the max-h-[120px]
-      setContentOverflows(contentHeight > containerHeight);
+      // We'll keep this commented out since we're not using it yet
+      // But we're keeping the reference for future UI improvements
+      // setContentOverflows(contentHeight > containerHeight);
     }
   }, [answer]);
 

@@ -39,7 +39,9 @@ export default function SignupPage() {
       });
       
       router.push("/");
-    } catch (error) {
+    } catch (err) {
+      // Using the error in a console log to avoid unused variable warning
+      console.error("Signup error:", err);
       toast.error("Error", {
         description: "Something went wrong. Please try again.",
       });

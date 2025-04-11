@@ -56,7 +56,7 @@ export default function Home() {
               }}
               disabled={!query.trim()}
             >
-              I'm Feeling Lucky
+              I&apos;m Feeling Lucky
             </Button>
           </div>
         </form>

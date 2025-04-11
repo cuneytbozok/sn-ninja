@@ -40,7 +40,9 @@ export default function LoginPage() {
       });
       
       router.push("/");
-    } catch (error) {
+    } catch (err) {
+      // Using the error in a console log to avoid unused variable warning
+      console.error("Login error:", err);
       toast.error("Error", {
         description: "Invalid email or password. Please try again.",
       });
@@ -110,7 +112,7 @@ export default function LoginPage() {
             </div>
             
             <div className="text-center text-sm">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup" className="text-primary hover:underline">
                 Sign up
               </Link>

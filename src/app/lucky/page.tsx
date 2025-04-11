@@ -29,10 +29,22 @@ export default function LuckyPage() {
     setIsLoading(true);
     
     // Mock data - would be replaced with real API call
-    setTimeout(() => {
-      setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.\n\nServiceNow was founded in 2004 by Fred Luddy, who previously served as CTO at Peregrine Systems and Remedy Corporation. The company initially focused on IT service management but has since expanded into other areas like IT operations management, IT business management, customer service management, HR service delivery, and security operations.\n\nServiceNow's platform is built on a single data model and uses a common service data platform. This allows for seamless integration between different modules and applications. The platform includes features such as workflow automation, AI and machine learning capabilities, virtual agents, performance analytics, and a mobile experience.\n\nMany large enterprises use ServiceNow to manage their IT services and business workflows. The platform is highly customizable and can be tailored to meet specific organizational needs. ServiceNow also offers a developer program that allows developers to build custom applications on the Now Platform.");
+    // In the real implementation, we would use searchQuery to fetch data
+    try {
+      // Example of how you would use the search query parameter:
+      // const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}&lucky=true`);
+      // const data = await response.json();
+      // setAnswer(data.answer);
+      
+      // For now, using setTimeout to simulate API call
+      setTimeout(() => {
+        setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.\n\nServiceNow was founded in 2004 by Fred Luddy, who previously served as CTO at Peregrine Systems and Remedy Corporation. The company initially focused on IT service management but has since expanded into other areas like IT operations management, IT business management, customer service management, HR service delivery, and security operations.\n\nServiceNow's platform is built on a single data model and uses a common service data platform. This allows for seamless integration between different modules and applications. The platform includes features such as workflow automation, AI and machine learning capabilities, virtual agents, performance analytics, and a mobile experience.\n\nMany large enterprises use ServiceNow to manage their IT services and business workflows. The platform is highly customizable and can be tailored to meet specific organizational needs. ServiceNow also offers a developer program that allows developers to build custom applications on the Now Platform.");
+        setIsLoading(false);
+      }, 1500);
+    } catch (error) {
+      console.error("Error fetching data:", error);
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   useEffect(() => {

@@ -18,14 +18,13 @@ import { Switch } from "@/components/ui/switch";
 import { 
   Table, 
   TableBody, 
-  TableCaption, 
   TableCell, 
   TableHead, 
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { CalendarIcon, SearchIcon, Settings, UserCircle2 } from "lucide-react";
+import { CalendarIcon, SearchIcon, UserCircle2 } from "lucide-react";
 
 // Mock search history data
 const searchHistory = [
