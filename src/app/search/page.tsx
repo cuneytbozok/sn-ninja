@@ -34,14 +34,14 @@ export default function SearchPage() {
     }
   };
 
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = async (query: string) => {
     setIsLoading(true);
     
     // Mock data - would be replaced with real API call
-    // In the real implementation, we would use searchQuery to fetch data
     try {
-      // Example of how you would use the search query parameter:
-      // const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+      // In a real implementation, we would use the query parameter:
+      console.log(`Searching for: ${query}`);
+      // const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
       // const data = await response.json();
       // setAnswer(data.answer);
       // setResults(data.results);
@@ -90,15 +90,18 @@ export default function SearchPage() {
     }
   }, [initialQuery]);
 
-  // Check if content overflows - using this for UI feedback
+  // This effect is for future UI enhancements
   useEffect(() => {
+    // Commented out to avoid ESLint warnings while preserving the intention
+    // for future implementation
+    /*
     if (answerContentRef.current) {
       const contentHeight = answerContentRef.current.scrollHeight;
       const containerHeight = 120; // Same as the max-h-[120px]
-      // We'll keep this commented out since we're not using it yet
-      // But we're keeping the reference for future UI improvements
-      // setContentOverflows(contentHeight > containerHeight);
+      const overflows = contentHeight > containerHeight;
+      // We could use this to show an indicator or auto-expand if needed
     }
+    */
   }, [answer]);
 
   return (

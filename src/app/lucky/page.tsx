@@ -25,14 +25,14 @@ export default function LuckyPage() {
     }
   };
 
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = async (query: string) => {
     setIsLoading(true);
     
     // Mock data - would be replaced with real API call
-    // In the real implementation, we would use searchQuery to fetch data
     try {
-      // Example of how you would use the search query parameter:
-      // const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}&lucky=true`);
+      // In a real implementation, we would use the query parameter to fetch data:
+      console.log(`Fetching answer for: ${query}`);
+      // const response = await fetch(`/api/search?query=${encodeURIComponent(query)}&lucky=true`);
       // const data = await response.json();
       // setAnswer(data.answer);
       

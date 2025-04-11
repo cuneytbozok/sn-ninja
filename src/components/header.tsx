@@ -16,7 +16,15 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Menu, UserCircle2 } from "lucide-react";
 
 export default function Header() {
-  const [isAuth, setIsAuth] = useState(false);
+  // Using a hardcoded value for now, in a real app this would be connected to auth state
+  const isAuth = false;
+  
+  // Mock login function (will be replaced with real authentication)
+  const handleLogin = () => {
+    // This would be connected to auth in a real implementation
+    // setIsAuth(true);
+    console.log("Login functionality would be implemented here");
+  };
 
   return (
     <header className="border-b border-border/40 bg-black">
@@ -98,7 +106,13 @@ export default function Header() {
             </DropdownMenu>
           ) : (
             <div className="flex gap-3">
-              <Button asChild variant="ghost" className="hidden md:flex" size="sm">
+              <Button 
+                asChild 
+                variant="ghost" 
+                className="hidden md:flex" 
+                size="sm"
+                onClick={handleLogin}
+              >
                 <Link href="/login">Log in</Link>
               </Button>
               <Button asChild size="sm">
