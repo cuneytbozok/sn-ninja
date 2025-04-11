@@ -46,7 +46,7 @@ export default function SearchPage() {
     
     // Mock data - would be replaced with real API call
     setTimeout(() => {
-      setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.");
+      setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.\n\nServiceNow was founded in 2004 by Fred Luddy, who previously served as CTO at Peregrine Systems and Remedy Corporation. The company initially focused on IT service management but has since expanded into other areas like IT operations management, IT business management, customer service management, HR service delivery, and security operations.\n\nServiceNow's platform is built on a single data model and uses a common service data platform. This allows for seamless integration between different modules and applications. The platform includes features such as workflow automation, AI and machine learning capabilities, virtual agents, performance analytics, and a mobile experience.\n\nMany large enterprises use ServiceNow to manage their IT services and business workflows. The platform is highly customizable and can be tailored to meet specific organizational needs. ServiceNow also offers a developer program that allows developers to build custom applications on the Now Platform.");
       
       setResults([
         {
@@ -133,32 +133,30 @@ export default function SearchPage() {
           <>
             {/* Ninja Answer Section */}
             {answer && (
-              <Card className="border border-border/50 mb-6 overflow-hidden bg-background">
-                <CardHeader className="bg-background py-3 border-b border-border/20">
+              <Card className="border border-white/30 mb-6 overflow-hidden bg-background shadow-lg">
+                <CardHeader className="bg-background py-3 border-b border-white/20">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Ninja Answer:</CardTitle>
-                    {contentOverflows && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 px-2"
-                        onClick={() => setIsExpanded(!isExpanded)}
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                        <span className="ml-1 text-xs">
-                          {isExpanded ? "Collapse" : "Expand"}
-                        </span>
-                      </Button>
-                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 px-2"
+                      onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                      <span className="ml-1 text-xs">
+                        {isExpanded ? "Collapse" : "Expand"}
+                      </span>
+                    </Button>
                   </div>
                 </CardHeader>
                 <ScrollArea className={isExpanded ? "max-h-[500px]" : "max-h-[120px]"}>
                   <CardContent className="pt-4" ref={answerContentRef}>
-                    <p>{answer}</p>
+                    <p className="whitespace-pre-line">{answer}</p>
                   </CardContent>
                 </ScrollArea>
               </Card>
