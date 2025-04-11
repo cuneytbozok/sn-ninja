@@ -1,75 +1,67 @@
-import Image from "next/image";
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SearchIcon } from "lucide-react";
 
 export default function Home() {
+  const [query, setQuery] = useState("");
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          ServiceNow Agent
-        </p>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
+      <div className="w-full max-w-2xl flex flex-col items-center space-y-10">
+        <h1 className="text-4xl font-bold text-center">
+          SN Ninja here to help
+        </h1>
+        
+        <form onSubmit={handleSearch} className="w-full space-y-4">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Ask any ServiceNow question..."
+              className="w-full pl-10 pr-4 py-6 bg-secondary border border-border/50 rounded-xl text-lg shadow-md focus-visible:ring-2 focus-visible:ring-primary"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          </div>
+          
+          <div className="flex justify-center space-x-4">
+            <Button 
+              type="submit" 
+              variant="secondary"
+              className="px-6 py-2"
+              disabled={!query.trim()}
+            >
+              Search
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline"
+              className="px-6 py-2"
+              onClick={() => {
+                // This would integrate with your AI model in the future
+                if (query.trim()) {
+                  router.push(`/search?q=${encodeURIComponent(query)}`);
+                }
+              }}
+              disabled={!query.trim()}
+            >
+              I'm Feeling Lucky
+            </Button>
+          </div>
+        </form>
       </div>
-
-      <div className="relative flex place-items-center flex-col gap-8">
-        <h1 className="text-4xl font-bold">ServiceNow Search App</h1>
-        <p className="text-xl">Your AI-powered assistant for ServiceNow</p>
-        <div className="flex gap-4">
-          <Button asChild>
-            <Link href="/search">Start Searching</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/docs">Learn More</Link>
-          </Button>
-        </div>
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-3 lg:text-left">
-        <a
-          href="#"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Fast Answers{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              →
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Get instant answers to your ServiceNow questions.
-          </p>
-        </a>
-
-        <a
-          href="#"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Reliable Sources{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              →
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Answers based on verified ServiceNow documentation.
-          </p>
-        </a>
-
-        <a
-          href="#"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Secure Access{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              →
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            User authentication powered by Supabase.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
