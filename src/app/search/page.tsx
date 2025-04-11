@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ interface SearchResult {
   snippet: string;
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQuery = searchParams.get("q") || "";
@@ -205,5 +205,31 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Loading placeholder
+function LoadingPlaceholder() {
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <div className="grid gap-6">
+        <div className="h-10 w-full bg-secondary/50 rounded-md animate-pulse"></div>
+        <div className="h-32 bg-secondary/50 rounded-xl animate-pulse"></div>
+        <div className="h-6 w-48 bg-secondary/50 rounded-md animate-pulse mt-4"></div>
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-24 bg-secondary/30 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<LoadingPlaceholder />}>
+      <SearchPageContent />
+    </Suspense>
   );
 } 

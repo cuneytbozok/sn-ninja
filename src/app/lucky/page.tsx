@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, SearchIcon } from "lucide-react";
 
-export default function LuckyPage() {
+function LuckyPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQuery = searchParams.get("q") || "";
@@ -115,5 +115,28 @@ export default function LuckyPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Loading placeholder
+function LoadingPlaceholder() {
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <div className="grid gap-6">
+        <div className="flex items-center mb-4">
+          <div className="h-10 w-32 bg-secondary/50 rounded-md animate-pulse"></div>
+        </div>
+        <div className="h-10 w-full bg-secondary/50 rounded-md animate-pulse"></div>
+        <div className="h-64 bg-secondary/50 rounded-xl animate-pulse"></div>
+      </div>
+    </div>
+  );
+}
+
+export default function LuckyPage() {
+  return (
+    <Suspense fallback={<LoadingPlaceholder />}>
+      <LuckyPageContent />
+    </Suspense>
   );
 } 
