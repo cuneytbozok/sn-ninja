@@ -50,9 +50,8 @@ export default function Home() {
               variant="outline"
               className="px-6 py-2"
               onClick={() => {
-                // This would integrate with your AI model in the future
                 if (query.trim()) {
-                  router.push(`/search?q=${encodeURIComponent(query)}`);
+                  router.push(`/lucky?q=${encodeURIComponent(query)}`);
                 }
               }}
               disabled={!query.trim()}
