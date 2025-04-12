@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState, useRef, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, ExternalLink, SearchIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
 
 interface SearchResult {
   title: string;
@@ -16,79 +17,79 @@ interface SearchResult {
 }
 
 function SearchPageContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const initialQuery = searchParams.get("q") || "";
-  const [query, setQuery] = useState(initialQuery);
+  const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const answerContentRef = useRef<HTMLDivElement>(null);
+  const initialLoadComplete = useRef(false);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query)}`);
-      performSearch(query);
+  // Load query from sessionStorage on initial render
+  useEffect(() => {
+    // Only run this effect once
+    if (initialLoadComplete.current) return;
+    initialLoadComplete.current = true;
+    
+    // Use try-catch to handle potential sessionStorage errors
+    try {
+      const savedQuery = sessionStorage.getItem('lastQuery');
+      if (savedQuery) {
+        setQuery(savedQuery);
+        performSearch(savedQuery);
+      }
+    } catch (error) {
+      console.error("Error accessing sessionStorage:", error);
     }
+  }, []);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    
+    try {
+      // Update sessionStorage with the current query
+      sessionStorage.setItem('lastQuery', query);
+    } catch (error) {
+      // Non-critical error, can continue without storing
+      console.error("Error storing in sessionStorage:", error);
+    }
+    
+    performSearch(query);
   };
 
-  const performSearch = async (query: string) => {
+  const performSearch = async (searchQuery: string) => {
     setIsLoading(true);
     
-    // Mock data - would be replaced with real API call
     try {
-      // In a real implementation, we would use the query parameter:
-      console.log(`Searching for: ${query}`);
-      // const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-      // const data = await response.json();
-      // setAnswer(data.answer);
-      // setResults(data.results);
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          query: searchQuery,
+          isLucky: false 
+        }),
+      });
       
-      setTimeout(() => {
-        setAnswer("ServiceNow is a cloud computing platform that automates IT business management workflows. It includes products for IT service, operations, and business management. The core of ServiceNow's platform is IT service management (ITSM), which helps organizations to consolidate and automate service relationships across the enterprise.\n\nServiceNow was founded in 2004 by Fred Luddy, who previously served as CTO at Peregrine Systems and Remedy Corporation. The company initially focused on IT service management but has since expanded into other areas like IT operations management, IT business management, customer service management, HR service delivery, and security operations.\n\nServiceNow's platform is built on a single data model and uses a common service data platform. This allows for seamless integration between different modules and applications. The platform includes features such as workflow automation, AI and machine learning capabilities, virtual agents, performance analytics, and a mobile experience.\n\nMany large enterprises use ServiceNow to manage their IT services and business workflows. The platform is highly customizable and can be tailored to meet specific organizational needs. ServiceNow also offers a developer program that allows developers to build custom applications on the Now Platform.");
-        
-        setResults([
-          {
-            title: "What is ServiceNow? | ServiceNow",
-            url: "https://www.servicenow.com/what-is-servicenow.html",
-            snippet: "ServiceNow is a platform that enables digital workflows to drive business growth, increase resilience, and enhance employee productivity..."
-          },
-          {
-            title: "ServiceNow - Wikipedia",
-            url: "https://en.wikipedia.org/wiki/ServiceNow",
-            snippet: "ServiceNow is an American software company based in Santa Clara, California that develops a cloud computing platform to help companies manage digital workflows..."
-          },
-          {
-            title: "ServiceNow - Overview, Products, Competitors",
-            url: "https://docs.servicenow.com/bundle/tokyo-platform-administration/page/administer/overview",
-            snippet: "ServiceNow is a software platform that enables organizations to manage digital workflows for enterprise operations. ServiceNow provides cloud-based solutions..."
-          },
-          {
-            title: "ServiceNow Developer Documentation",
-            url: "https://developer.servicenow.com/dev.do",
-            snippet: "ServiceNow Developer documentation provides resources for building applications on the Now Platform. Find guides, API references, and more..."
-          },
-          {
-            title: "ServiceNow Community Forums",
-            url: "https://community.servicenow.com",
-            snippet: "Connect with ServiceNow experts, ask questions, share ideas, and access resources to make the most of your ServiceNow implementation..."
-          }
-        ]);
-        setIsLoading(false);
-      }, 1500);
+      if (!response.ok) {
+        throw new Error(`Search request failed with status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setAnswer(data.answer);
+      setResults(data.results);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error searching:", error);
+      toast.error("Search failed", {
+        description: "There was an error processing your search. Please try again."
+      });
+    } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (initialQuery) {
-      performSearch(initialQuery);
-    }
-  }, [initialQuery]);
 
   // This effect is for future UI enhancements
   useEffect(() => {

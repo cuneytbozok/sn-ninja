@@ -12,9 +12,23 @@ export default function Home() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query)}`);
-    }
+    if (!query.trim()) return;
+    
+    // Store in sessionStorage which is cleared when the browser is closed
+    sessionStorage.setItem('lastQuery', query);
+    
+    // Navigate to search page without query parameters
+    router.push('/search');
+  };
+
+  const handleLuckySearch = () => {
+    if (!query.trim()) return;
+    
+    // Store in sessionStorage which is cleared when the browser is closed
+    sessionStorage.setItem('lastQuery', query);
+    
+    // Navigate to lucky page without query parameters
+    router.push('/lucky');
   };
 
   return (
@@ -49,11 +63,7 @@ export default function Home() {
               type="button" 
               variant="outline"
               className="px-6 py-2"
-              onClick={() => {
-                if (query.trim()) {
-                  router.push(`/lucky?q=${encodeURIComponent(query)}`);
-                }
-              }}
+              onClick={handleLuckySearch}
               disabled={!query.trim()}
             >
               I&apos;m Feeling Lucky
