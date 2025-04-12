@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  // Use the recommended way to handle dynamic components by making sure they're generated at request time
+  output: 'standalone',
 };
 
 export default nextConfig;

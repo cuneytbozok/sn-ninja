@@ -20,6 +20,9 @@ import { supabase } from "@/lib/supabase";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// Tell Next.js to render this page dynamically at request time
+export const dynamic = 'force-dynamic';
+
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

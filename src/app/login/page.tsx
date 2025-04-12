@@ -30,6 +30,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+// Tell Next.js to render this page dynamically at request time
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
