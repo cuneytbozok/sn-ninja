@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,13 +17,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Tell Next.js to render this page dynamically at request time
 export const dynamic = 'force-dynamic';
 
-export default function SignupPage() {
+function SignupContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -236,5 +236,26 @@ export default function SignupPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+// Wrap the component in a Suspense boundary
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-64px)] px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardDescription>Loading...</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center py-8">
+            <Loader2 className="h-16 w-16 text-primary animate-spin" />
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   );
 } 

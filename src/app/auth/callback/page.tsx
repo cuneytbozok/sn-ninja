@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 // Tell Next.js to render this page dynamically at request time
 export const dynamic = 'force-dynamic';
 
-export default function AuthCallbackPage() {
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -71,5 +71,29 @@ export default function AuthCallbackPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Wrap the component using useSearchParams in a Suspense boundary
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="container flex items-center justify-center min-h-[calc(100vh-64px)]">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Email Verification</CardTitle>
+            <CardDescription>Verifying your email...</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center space-y-4 py-8">
+            <Loader2 className="h-16 w-16 text-primary animate-spin" />
+            <p className="text-center text-muted-foreground">
+              Please wait while we verify your email...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <CallbackContent />
+    </Suspense>
   );
 } 
