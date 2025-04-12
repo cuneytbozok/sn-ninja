@@ -9,8 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, ExternalLink, SearchIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { FeedbackButtons } from "@/components/ui/feedback-buttons";
+import { saveSearch, saveFeedback } from "@/lib/supabase-helpers";
 
 interface SearchResult {
+  id: string;
   title: string;
   url: string;
   snippet: string;
@@ -20,6 +23,7 @@ function SearchPageContent() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState("");
+  const [searchId, setSearchId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +84,24 @@ function SearchPageContent() {
       
       const data = await response.json();
       setAnswer(data.answer);
-      setResults(data.results);
+      
+      // Assign IDs to results if they don't have them
+      const resultsWithIds = data.results.map((result: SearchResult, index: number) => ({
+        ...result,
+        id: result.id || `result-${index}`
+      }));
+      
+      setResults(resultsWithIds);
+      
+      // Save search to supabase
+      const mockUserId = "user-123"; // In a real app, get this from auth context
+      try {
+        const savedSearch = await saveSearch(mockUserId, searchQuery, data.answer);
+        setSearchId(savedSearch.id);
+      } catch (error) {
+        console.error("Error saving search:", error);
+        // Non-critical error, continue without saving
+      }
     } catch (error) {
       console.error("Error searching:", error);
       toast.error("Search failed", {
@@ -88,6 +109,31 @@ function SearchPageContent() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFeedback = async (itemId: string | number, isHelpful: boolean) => {
+    if (!searchId) {
+      toast.error("Cannot save feedback", { 
+        description: "Search session not properly initialized" 
+      });
+      return;
+    }
+    
+    const mockUserId = "user-123"; // In a real app, get this from auth context
+    const itemType = itemId === 'answer' ? 'answer' : 'result';
+    
+    try {
+      await saveFeedback(
+        mockUserId,
+        searchId,
+        itemId.toString(),
+        itemType,
+        isHelpful
+      );
+    } catch (error) {
+      console.error("Error saving feedback:", error);
+      throw error; // Let the FeedbackButtons component handle this
     }
   };
 
@@ -148,21 +194,28 @@ function SearchPageContent() {
                 <CardHeader className="bg-background py-3 border-b border-white/20">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Ninja Answer:</CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 px-2"
-                      onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                      {isExpanded ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                      <span className="ml-1 text-xs">
-                        {isExpanded ? "Collapse" : "Expand"}
-                      </span>
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <FeedbackButtons 
+                        itemId="answer"
+                        itemType="answer"
+                        onFeedback={handleFeedback}
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 px-2 ml-2"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                        <span className="ml-1 text-xs">
+                          {isExpanded ? "Collapse" : "Expand"}
+                        </span>
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <ScrollArea className={isExpanded ? "max-h-[500px]" : "max-h-[120px]"}>
@@ -194,7 +247,14 @@ function SearchPageContent() {
                           </a>
                           <p className="text-sm text-muted-foreground mt-1">{result.url}</p>
                         </div>
-                        <Badge variant="outline" className="text-xs">Source</Badge>
+                        <div className="flex items-center">
+                          <FeedbackButtons 
+                            itemId={result.id}
+                            itemType="result"
+                            onFeedback={handleFeedback}
+                          />
+                          <Badge variant="outline" className="text-xs ml-2">Source</Badge>
+                        </div>
                       </div>
                       <p className="mt-2 text-sm">{result.snippet}</p>
                     </div>

@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, UserCircle2 } from "lucide-react";
+import { Menu, UserCircle2, Bookmark } from "lucide-react";
 
 export default function Header() {
   // Using a hardcoded value for now, in a real app this would be connected to auth state
@@ -37,14 +37,9 @@ export default function Header() {
             <Link href="/" className="text-sm font-medium text-white hover:text-primary transition-colors">
               Home
             </Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              Docs
-            </Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              About
-            </Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              Help
+            <Link href="/saved-searches" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center">
+              <Bookmark className="h-3 w-3 mr-1" />
+              Saved Searches
             </Link>
           </nav>
         </div>
@@ -64,14 +59,9 @@ export default function Header() {
                 <Link href="/" className="hover:text-primary transition-colors">
                   Home
                 </Link>
-                <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Docs
-                </Link>
-                <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  About
-                </Link>
-                <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Help
+                <Link href="/saved-searches" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
+                  <Bookmark className="h-4 w-4 mr-2" />
+                  Saved Searches
                 </Link>
               </nav>
             </SheetContent>
@@ -94,6 +84,9 @@ export default function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/saved-searches">Saved Searches</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings">Settings</Link>
