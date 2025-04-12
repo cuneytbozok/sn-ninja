@@ -17,37 +17,94 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetLoading, setIsResetLoading] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    setError(null);
+    
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
 
     setIsLoading(true);
     
-    // This would be replaced with actual Supabase login logic
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
       
       toast.success("Logged in successfully!", {
         description: "Welcome back to SN Ninja.",
       });
       
       router.push("/");
-    } catch (err) {
-      // Using the error in a console log to avoid unused variable warning
+    } catch (err: any) {
       console.error("Login error:", err);
+      setError(err?.message || "Invalid email or password. Please try again.");
       toast.error("Error", {
-        description: "Invalid email or password. Please try again.",
+        description: err?.message || "Invalid email or password. Please try again.",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
+    if (!resetEmail) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    try {
+      setIsResetLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      setResetEmailSent(true);
+      toast.success("Password reset email sent", {
+        description: "Please check your email for the password reset link.",
+      });
+    } catch (err: any) {
+      console.error("Password reset error:", err);
+      setError(err?.message || "Failed to send password reset email. Please try again.");
+      toast.error("Error", {
+        description: err?.message || "Failed to send password reset email. Please try again.",
+      });
+    } finally {
+      setIsResetLoading(false);
     }
   };
 
@@ -62,6 +119,13 @@ export default function LoginPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -76,12 +140,65 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Forgot password?
-                </Link>
+                <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Reset Password</DialogTitle>
+                      <DialogDescription>
+                        {resetEmailSent 
+                          ? "Check your email for a password reset link." 
+                          : "Enter your email address and we'll send you a link to reset your password."}
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    {!resetEmailSent ? (
+                      <form onSubmit={handleResetPassword} className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="resetEmail">Email</Label>
+                          <Input
+                            id="resetEmail"
+                            type="email"
+                            placeholder="example@example.com"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <DialogFooter className="pt-4">
+                          <Button 
+                            type="submit" 
+                            disabled={isResetLoading}
+                            className="w-full"
+                          >
+                            {isResetLoading ? "Sending..." : "Send Reset Link"}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    ) : (
+                      <div className="py-6 text-center space-y-4">
+                        <p className="text-muted-foreground">
+                          We've sent a password reset link to <span className="font-medium">{resetEmail}</span>.
+                          Please check your inbox and follow the instructions.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setIsResetDialogOpen(false)}
+                          className="w-full"
+                        >
+                          Close
+                        </Button>
+                      </div>
+                    )}
+                  </DialogContent>
+                </Dialog>
               </div>
               <Input
                 id="password"

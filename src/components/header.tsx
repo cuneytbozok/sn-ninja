@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,17 +13,47 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, UserCircle2, Bookmark } from "lucide-react";
+import { Menu, User, Bookmark, LogOut, Settings } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
+import { toast } from "sonner";
 
 export default function Header() {
-  // Using a hardcoded value for now, in a real app this would be connected to auth state
-  const isAuth = false;
+  const { user, signOut, isLoading } = useAuth();
+  const router = useRouter();
   
-  // Mock login function (will be replaced with real authentication)
-  const handleLogin = () => {
-    // This would be connected to auth in a real implementation
-    // setIsAuth(true);
-    console.log("Login functionality would be implemented here");
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Error signing out");
+    }
+  };
+
+  const getInitials = () => {
+    if (!user?.email) return "U";
+    
+    const email = user.email;
+    return email.charAt(0).toUpperCase();
+  };
+
+  const getDisplayName = () => {
+    if (!user?.user_metadata) return user?.email || "User";
+    
+    const firstName = user.user_metadata.first_name;
+    const lastName = user.user_metadata.last_name;
+    
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    } else if (firstName) {
+      return firstName;
+    } else if (lastName) {
+      return lastName;
+    }
+    
+    return user.email || "User";
   };
 
   return (
@@ -63,48 +93,87 @@ export default function Header() {
                   <Bookmark className="h-4 w-4 mr-2" />
                   Saved Searches
                 </Link>
+                {user && (
+                  <>
+                    <Link href="/profile" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Profile
+                    </Link>
+                    <button 
+                      onClick={handleSignOut}
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign out
+                    </button>
+                  </>
+                )}
+                {!user && !isLoading && (
+                  <>
+                    <Link href="/login" className="text-muted-foreground hover:text-primary transition-colors">
+                      Sign in
+                    </Link>
+                    <Link href="/signup" className="text-muted-foreground hover:text-primary transition-colors">
+                      Sign up
+                    </Link>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
-          {isAuth ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt="User" />
+                    <AvatarImage src="" alt={getDisplayName()} />
                     <AvatarFallback>
-                      <UserCircle2 className="h-6 w-6" />
+                      {getInitials()}
                     </AvatarFallback>
                   </Avatar>
                   <span className="sr-only">User menu</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span>{getDisplayName()}</span>
+                    <span className="text-xs text-muted-foreground">{user.email}</span>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/profile" className="flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/saved-searches">Saved Searches</Link>
+                  <Link href="/saved-searches" className="flex items-center">
+                    <Bookmark className="h-4 w-4 mr-2" />
+                    Saved Searches
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/settings">Settings</Link>
+                  <Link href="/settings" className="flex items-center">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/logout">Log out</Link>
+                <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
+          ) : !isLoading ? (
             <div className="flex gap-3">
               <Button 
                 asChild 
                 variant="ghost" 
                 className="hidden md:flex" 
                 size="sm"
-                onClick={handleLogin}
               >
                 <Link href="/login">Log in</Link>
               </Button>
@@ -112,7 +181,7 @@ export default function Header() {
                 <Link href="/signup">Sign up</Link>
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </header>
