@@ -39,7 +39,7 @@ export async function runCrawler(): Promise<void> {
  * Runs a specific step of the crawling process
  * @param step The step to run
  */
-export async function runCrawlerStep(step: "sitemaps" | "content" | "embeddings"): Promise<void> {
+export async function runCrawlerStep(step: "sitemaps" | "content" | "embeddings" | "combined"): Promise<void> {
   const logger = new Logger("crawler");
   
   try {
@@ -54,6 +54,14 @@ export async function runCrawlerStep(step: "sitemaps" | "content" | "embeddings"
         break;
       case "embeddings":
         await generateEmbeddings();
+        break;
+      case "combined":
+        // Run sitemaps discovery and content extraction in sequence
+        logger.info("Running combined step: sitemaps discovery");
+        await discoverSitemaps();
+        
+        logger.info("Running combined step: content extraction");
+        await extractContent();
         break;
       default:
         throw new Error(`Unknown step: ${step}`);

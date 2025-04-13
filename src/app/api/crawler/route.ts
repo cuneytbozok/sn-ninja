@@ -36,15 +36,15 @@ export async function POST(request: Request) {
     
     if (step) {
       // Run a specific step
-      if (!["sitemaps", "content", "embeddings"].includes(step)) {
+      if (!["sitemaps", "content", "embeddings", "combined"].includes(step)) {
         return NextResponse.json(
-          { error: `Invalid step: ${step}. Valid steps are: sitemaps, content, embeddings` },
+          { error: `Invalid step: ${step}. Valid steps are: sitemaps, content, embeddings, combined` },
           { status: 400 }
         );
       }
       
       logger.info(`Starting crawler step: ${step}`);
-      await runCrawlerStep(step as "sitemaps" | "content" | "embeddings");
+      await runCrawlerStep(step as "sitemaps" | "content" | "embeddings" | "combined");
       return NextResponse.json({ success: true, message: `Crawler step '${step}' completed successfully` });
     } else {
       // Run the complete crawler
@@ -70,6 +70,6 @@ export async function GET() {
   return NextResponse.json({
     status: "ready",
     message: "Crawler is ready to accept commands. Use POST to trigger the crawler.",
-    availableSteps: ["sitemaps", "content", "embeddings"]
+    availableSteps: ["sitemaps", "content", "embeddings", "combined"]
   });
 } 
