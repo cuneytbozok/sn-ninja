@@ -21,7 +21,7 @@ export function FeedbackButtons({ itemId, itemType, onFeedback }: FeedbackButton
       toast.success(`Marked as ${isHelpful ? 'helpful' : 'not helpful'}`);
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      toast.error("Couldn't save your feedback");
+      toast.error("Couldn't process your feedback");
     } finally {
       setIsSubmitting(false);
     }

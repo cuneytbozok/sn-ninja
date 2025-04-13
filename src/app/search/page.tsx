@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { ChevronDown, ChevronUp, ExternalLink, SearchIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { FeedbackButtons } from "@/components/ui/feedback-buttons";
-import { saveSearch, saveFeedback } from "@/lib/supabase-helpers";
 
 interface SearchResult {
   id: string;
@@ -23,7 +22,6 @@ function SearchPageContent() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState("");
-  const [searchId, setSearchId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,25 +65,20 @@ function SearchPageContent() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          query: searchQuery,
-          isLucky: false 
-        }),
+      const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`, {
+        method: 'GET',
       });
       
       if (!response.ok) {
-        throw new Error(`Search request failed with status: ${response.status}`);
+        throw new Error(`Error: ${response.status}`);
       }
       
       const data = await response.json();
-      setAnswer(data.answer);
       
-      // Assign IDs to results if they don't have them
+      // Update UI with search results
+      setAnswer(data.answer || "");
+      
+      // Add id to results if they don't have one
       const resultsWithIds = data.results.map((result: SearchResult, index: number) => ({
         ...result,
         id: result.id || `result-${index}`
@@ -93,15 +86,7 @@ function SearchPageContent() {
       
       setResults(resultsWithIds);
       
-      // Save search to supabase
-      const mockUserId = "user-123"; // In a real app, get this from auth context
-      try {
-        const savedSearch = await saveSearch(mockUserId, searchQuery, data.answer);
-        setSearchId(savedSearch.id);
-      } catch (error) {
-        console.error("Error saving search:", error);
-        // Non-critical error, continue without saving
-      }
+      // Remove the saved search functionality
     } catch (error) {
       console.error("Error searching:", error);
       toast.error("Search failed", {
@@ -113,26 +98,11 @@ function SearchPageContent() {
   };
 
   const handleFeedback = async (itemId: string | number, isHelpful: boolean) => {
-    if (!searchId) {
-      toast.error("Cannot save feedback", { 
-        description: "Search session not properly initialized" 
-      });
-      return;
-    }
-    
-    const mockUserId = "user-123"; // In a real app, get this from auth context
-    const itemType = itemId === 'answer' ? 'answer' : 'result';
-    
     try {
-      await saveFeedback(
-        mockUserId,
-        searchId,
-        itemId.toString(),
-        itemType,
-        isHelpful
-      );
+      // Just log the feedback without saving to database
+      console.log("Feedback submitted:", { itemId, isHelpful });
     } catch (error) {
-      console.error("Error saving feedback:", error);
+      console.error("Error with feedback:", error);
       throw error; // Let the FeedbackButtons component handle this
     }
   };

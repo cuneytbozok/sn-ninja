@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, User, Bookmark, LogOut, Settings } from "lucide-react";
+import { Menu, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { toast } from "sonner";
 
@@ -67,10 +67,6 @@ export default function Header() {
             <Link href="/" className="text-sm font-medium text-white hover:text-primary transition-colors">
               Home
             </Link>
-            <Link href="/saved-searches" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center">
-              <Bookmark className="h-3 w-3 mr-1" />
-              Saved Searches
-            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-4 ml-auto">
@@ -88,10 +84,6 @@ export default function Header() {
               <nav className="grid gap-6 text-lg font-medium">
                 <Link href="/" className="hover:text-primary transition-colors">
                   Home
-                </Link>
-                <Link href="/saved-searches" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
-                  <Bookmark className="h-4 w-4 mr-2" />
-                  Saved Searches
                 </Link>
                 {user && (
                   <>
@@ -146,12 +138,6 @@ export default function Header() {
                   <Link href="/profile" className="flex items-center">
                     <User className="h-4 w-4 mr-2" />
                     Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/saved-searches" className="flex items-center">
-                    <Bookmark className="h-4 w-4 mr-2" />
-                    Saved Searches
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
